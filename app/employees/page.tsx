@@ -36,6 +36,33 @@ export default function EmployeesPage() {
     }
   };
 
+  const deleteEmployee = async (id: number) => {
+  const confirmDelete = window.confirm(
+    "Are you sure you want to delete this employee?"
+  );
+
+  if (!confirmDelete) return;
+
+  try {
+    const response = await fetch(`/api/emp-users/${id}`, {
+      method: "DELETE",
+    });
+
+    const data = await response.json();
+
+    if (data.success) {
+      setEmployees((prev) =>
+        prev.filter((employee) => employee.id !== id)
+      );
+    } else {
+      alert(data.message);
+    }
+  } catch (error) {
+    console.log(error);
+    alert("Failed to delete employee");
+  }
+};
+
   return (
     <div
       style={{
@@ -93,6 +120,7 @@ export default function EmployeesPage() {
                 <th style={thStyle}>Email</th>
                 <th style={thStyle}>Designation</th>
                 <th style={thStyle}>Salary</th>
+                <th style={thStyle}>Actions</th>
               </tr>
             </thead>
 
@@ -104,6 +132,44 @@ export default function EmployeesPage() {
                   <td style={tdStyle}>{employee.email}</td>
                   <td style={tdStyle}>{employee.designation}</td>
                   <td style={tdStyle}>{employee.salary}</td>
+                  <td style={tdStyle}>
+                    <div
+                      style={{
+                        display: "flex",
+                        gap: "12px",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <button
+                        onClick={() =>
+                          router.push(`/employees/edit/${employee.id}`)
+                        }
+                        style={{
+                          background: "transparent",
+                          border: "none",
+                          cursor: "pointer",
+                          fontSize: "20px",
+                        }}
+                        title="Edit Employee"
+                      >
+                        ✏️
+                      </button>
+
+                      <button
+                        onClick={() => deleteEmployee(employee.id)}
+                        style={{
+                          background: "transparent",
+                          border: "none",
+                          cursor: "pointer",
+                          fontSize: "20px",
+                        }}
+                        title="Delete Employee"
+                      >
+                        🗑️
+                      </button>
+                    </div>
+                  </td>
                 </tr>
               ))}
             </tbody>
